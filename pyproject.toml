@@ -15,3 +15,8 @@ dependencies = [
 
 [project.scripts]
 netcapanalysis = "netcapanalysis.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["netcapanalysis*"]
+exclude = ["reports*", ".*"]

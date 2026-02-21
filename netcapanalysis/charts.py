@@ -197,3 +197,108 @@ def generate_port_mermaid(stats):
         lines.append(f'    "Port {port} ({service})": {data["count"]}')
 
     return "\n".join(lines)
+
+
+def generate_timeline_chart(timeline, output):
+    """Generate timeline mermaid diagram for multi-capture analysis"""
+    lines = ["timeline"]
+    lines.append("    title Network Conversation Timeline")
+    lines.append("    section Past -> Present")
+
+    for conv in timeline:
+        src = conv["src"]
+        dst = conv["dst"]
+        packets = conv["packet_count"]
+        turns = conv["turns"]
+        avg_size = conv["avg_packet_size"]
+        chattiness = conv["chattiness"]
+
+        label = f"{src} <-> {dst}"
+        event = f"{packets}pkts, {turns}turns, {avg_size:.0f}bytes avg, {chattiness:.1f}/turn"
+
+        lines.append(f"        {label}: {event}")
+
+    mermaid_code = "\n".join(lines)
+
+    if output:
+        if output.endswith(".png"):
+            mermaid_to_png(mermaid_code, output)
+        else:
+            Path(output).write_text(mermaid_code)
+
+    return mermaid_code
+
+
+def generate_timeline_sequence(timeline, output):
+    """Generate sequence diagram showing conversation flow"""
+    lines = ["sequenceDiagram"]
+
+    participants = set()
+    for conv in timeline:
+        participants.add(conv["src"])
+        participants.add(conv["dst"])
+
+    for p in sorted(participants):
+        lines.append(f"    participant {p}")
+
+    lines.append("")
+
+    for conv in timeline:
+        src = conv["src"]
+        dst = conv["dst"]
+        packets = conv["packet_count"]
+        turns = conv["turns"]
+        avg_size = conv["avg_packet_size"]
+        chattiness = conv["chattiness"]
+
+        note = f"{packets} pkts, {turns} turns, {avg_size:.0f} bytes avg, {chattiness:.1f} pkt/turn"
+        lines.append(f"    {src}->>{dst}: {note}")
+
+    mermaid_code = "\n".join(lines)
+
+    if output:
+        if output.endswith(".png"):
+            mermaid_to_png(mermaid_code, output)
+        else:
+            Path(output).write_text(mermaid_code)
+
+    return mermaid_code
+
+
+def generate_chattiness_chart(timeline, output):
+    """Generate bar chart of conversation chattiness"""
+    if not timeline:
+        print("No timeline data available")
+        return
+
+    conv_labels = [f"{c['src'][-8:]}->{c['dst'][-8:]}" for c in timeline[:15]]
+    chattiness = [c["chattiness"] for c in timeline[:15]]
+    turns = [c["turns"] for c in timeline[:15]]
+    packet_counts = [c["packet_count"] for c in timeline[:15]]
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 6))
+
+    axes[0].barh(range(len(conv_labels)), packet_counts, color="#3498db")
+    axes[0].set_yticks(range(len(conv_labels)))
+    axes[0].set_yticklabels(conv_labels, fontsize=8)
+    axes[0].set_xlabel("Packet Count")
+    axes[0].set_title("Packets per Conversation")
+    axes[0].invert_yaxis()
+
+    axes[1].barh(range(len(conv_labels)), turns, color="#2ecc71")
+    axes[1].set_yticks(range(len(conv_labels)))
+    axes[1].set_yticklabels(conv_labels, fontsize=8)
+    axes[1].set_xlabel("Turns")
+    axes[1].set_title("Direction Changes")
+    axes[1].invert_yaxis()
+
+    axes[2].barh(range(len(conv_labels)), chattiness, color="#e74c3c")
+    axes[2].set_yticks(range(len(conv_labels)))
+    axes[2].set_yticklabels(conv_labels, fontsize=8)
+    axes[2].set_xlabel("Packets per Turn")
+    axes[2].set_title("Chattiness")
+    axes[2].invert_yaxis()
+
+    plt.tight_layout()
+    plt.savefig(output, dpi=150)
+    plt.close()
