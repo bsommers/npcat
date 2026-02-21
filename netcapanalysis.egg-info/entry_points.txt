@@ -1,0 +1,2 @@
+[console_scripts]
+netcapanalysis = netcapanalysis.cli:cli

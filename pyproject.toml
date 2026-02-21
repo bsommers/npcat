@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netcapanalysis"
+version = "1.0.0"
+description = "Network Capture and Analysis Tool"
+requires-python = ">=3.8"
+dependencies = [
+    "click>=8.0.0",
+    "scapy>=2.5.0",
+    "matplotlib>=3.5.0",
+]
+
+[project.scripts]
+netcapanalysis = "netcapanalysis.cli:cli"
