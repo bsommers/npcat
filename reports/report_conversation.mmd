@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant 10.0.0.1
+    participant 10.0.0.2
+    participant 192.168.1.1
+    participant 192.168.1.10
+    participant 192.168.1.100
+    participant 8.8.8.8
+
+    192.168.1.10->>8.8.8.8: 15 packets, 540 bytes
+    10.0.0.1->>10.0.0.2: 10 packets, 440 bytes
+    192.168.1.100->>192.168.1.1: 5 packets, 140 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
+    192.168.1.10->>192.168.1.1: 1 packets, 58 bytes
