@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  netcapanalysis:
+    build: .
+    image: netcapanalysis:latest
+    container_name: netcapanalysis
+    capabilities:
+      - NET_RAW
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    volumes:
+      - ./data:/data
+    environment:
+      - TZ=${TZ:-UTC}
+    network: host
+    restart: unless-stopped
+
+  # Alias for capture command
+  capture:
+    extends:
+      service: netcapanalysis
+    command: capture --help
+
+  # Alias for analyze command
+  analyze:
+    extends:
+      service: netcapanalysis
+    command: analyze --help
+
+  # Alias for chart command
+  chart:
+    extends:
+      service: netcapanalysis
+    command: chart --help

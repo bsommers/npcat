@@ -228,6 +228,65 @@ sudo apt install wireshark tshark
 # Or use scapy (included)
 ```
 
+## Docker
+
+### Build Image
+
+```bash
+docker build -t netcapanalysis:latest .
+```
+
+### Run Commands
+
+```bash
+# Capture packets (requires --privileged)
+docker run --rm -it \
+  --privileged \
+  -v $(pwd)/data:/data \
+  netcapanalysis:latest capture -c 100 -o /data/capture.pcap
+
+# Analyze pcap file
+docker run --rm -it \
+  -v $(pwd)/data:/data \
+  netcapanalysis:latest analyze -i /data/capture.pcap -o /data/report.md
+
+# Generate chart
+docker run --rm -it \
+  -v $(pwd)/data:/data \
+  netcapanalysis:latest chart -i /data/capture.pcap -o /data/chart.png -t port
+```
+
+### Using Docker Compose
+
+```bash
+# Create data directory
+mkdir -p data
+
+# Capture packets
+docker compose run --rm netcapanalysis capture -c 100 -o /data/capture.pcap
+
+# Analyze
+docker compose run --rm netcapanalysis analyze -i /data/capture.pcap -o /data/report.md
+```
+
+### Privileges Required
+
+The container needs `--privileged` or specific capabilities for live capture:
+
+```bash
+docker run --rm -it \
+  --cap-add=NET_RAW \
+  --cap-add=NET_ADMIN \
+  -v $(pwd)/data:/data \
+  netcapanalysis capture -c 100 -o /data/capture.pcap
+```
+
+Or use `--privileged` for full access:
+
+```bash
+docker run --rm -it --privileged -v $(pwd)/data:/data netcapanalysis capture -c 100 -o /data/capture.pcap
+```
+
 ## License
 
 MIT

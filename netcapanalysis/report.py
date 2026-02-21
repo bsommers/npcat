@@ -19,16 +19,20 @@ from .charts import (
 def generate_report(stats, input_file, output_file, generate_png=True):
     """Generate markdown report with analysis results"""
 
-    base_path = Path(output_file).stem
+    output_path = Path(output_file)
+    base_path = output_path.stem
+    output_dir = output_path.parent
 
     if stats.get("lengths"):
-        generate_length_chart(stats, f"{base_path}_length.png")
+        generate_length_chart(stats, str(output_dir / f"{base_path}_length.png"))
 
     if stats.get("port_stats"):
-        generate_port_chart(stats, f"{base_path}_port.png")
+        generate_port_chart(stats, str(output_dir / f"{base_path}_port.png"))
 
     if stats.get("conversations"):
-        generate_conversation_diagram(stats, f"{base_path}_conversation.png")
+        generate_conversation_diagram(
+            stats, str(output_dir / f"{base_path}_conversation.png")
+        )
 
     mermaid_conv = generate_conversation_diagram(stats, None)
     mermaid_length = generate_length_mermaid(stats)
