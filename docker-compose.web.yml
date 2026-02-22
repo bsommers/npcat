@@ -12,6 +12,7 @@ services:
     environment:
       - FLASK_ENV=production
     privileged: true
+    entrypoint: ["python", "-m", "flask", "--app", "netcapanalysis.api", "run", "--host=0.0.0.0"]
     networks:
       - netcap
 
