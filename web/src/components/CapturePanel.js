@@ -9,16 +9,16 @@ import {
   VStack,
   useToast,
   Progress,
-  Text,
   Alert,
   AlertIcon,
+  HStack,
 } from '@chakra-ui/react';
 
 function CapturePanel() {
   const [interface_, setInterface] = useState('');
-  const [count, setCount] = useState(100);
+  const [count, setCount] = useState('');
   const [filter, setFilter] = useState('');
-  const [duration, setDuration] = useState('');
+  const [duration, setDuration] = useState('10');
   const [capturing, setCapturing] = useState(false);
   const [interfaces, setInterfaces] = useState([]);
   const toast = useToast();
@@ -46,9 +46,9 @@ function CapturePanel() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           interface: interface_,
-          count: parseInt(count),
+          count: count ? parseInt(count) : null,
           filter: filter,
-          duration: duration ? parseInt(duration) : null,
+          duration: duration ? parseInt(duration) : 10,
         }),
       });
       
@@ -57,7 +57,7 @@ function CapturePanel() {
       if (response.ok) {
         toast({
           title: 'Capture Complete',
-          description: `Saved to ${data.filename}`,
+          description: `Saved ${data.message} (${data.duration}s)`,
           status: 'success',
           duration: 5000,
         });
@@ -86,7 +86,7 @@ function CapturePanel() {
       <VStack spacing={4} align="stretch">
         <Alert status="info" borderRadius="md">
           <AlertIcon />
-          Live capture requires root privileges. The server must be running with appropriate permissions.
+          Live capture runs for 10 seconds by default. Uses tshark with root privileges.
         </Alert>
         
         <FormControl>
@@ -98,15 +98,27 @@ function CapturePanel() {
           </Select>
         </FormControl>
         
-        <FormControl>
-          <FormLabel>Packet Count</FormLabel>
-          <Input
-            type="number"
-            value={count}
-            onChange={(e) => setCount(e.target.value)}
-            placeholder="100"
-          />
-        </FormControl>
+        <HStack spacing={4}>
+          <FormControl>
+            <FormLabel>Duration (seconds)</FormLabel>
+            <Input
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              placeholder="10"
+            />
+          </FormControl>
+          
+          <FormControl>
+            <FormLabel>Max Packets (optional)</FormLabel>
+            <Input
+              type="number"
+              value={count}
+              onChange={(e) => setCount(e.target.value)}
+              placeholder="No limit"
+            />
+          </FormControl>
+        </HStack>
         
         <FormControl>
           <FormLabel>BPF Filter (optional)</FormLabel>
@@ -114,16 +126,6 @@ function CapturePanel() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="e.g., tcp port 80"
-          />
-        </FormControl>
-        
-        <FormControl>
-          <FormLabel>Duration (seconds, optional)</FormLabel>
-          <Input
-            type="number"
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            placeholder="Leave empty for packet count"
           />
         </FormControl>
         

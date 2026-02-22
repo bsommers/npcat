@@ -17,31 +17,39 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def capture():
     data = request.json
     interface = data.get("interface")
-    count = data.get("count", 100)
+    count = data.get("count")
     filter_expr = data.get("filter", "")
-    duration = data.get("duration")
+    duration = data.get("duration", 10)
 
     filename = f"{uuid.uuid4()}.pcap"
     filepath = os.path.join(UPLOAD_FOLDER, filename)
 
-    cmd = ["netcapanalysis", "capture", "-o", filepath, "-c", str(count)]
+    cmd = ["netcapanalysis", "capture", "-o", filepath, "-d", str(duration)]
 
     if interface:
         cmd.extend(["-i", interface])
+    if count:
+        cmd.extend(["-c", str(count)])
     if filter_expr:
         cmd.extend(["-f", filter_expr])
-    if duration:
-        cmd.extend(["-d", str(duration)])
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        timeout = duration + 10 if duration else 60
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
         if result.returncode != 0:
             return jsonify({"error": result.stderr}), 400
 
         return jsonify(
-            {"filename": filename, "filepath": filepath, "message": "Capture completed"}
+            {
+                "filename": filename,
+                "filepath": filepath,
+                "message": "Capture completed",
+                "duration": duration,
+            }
         )
+    except subprocess.TimeoutExpired:
+        return jsonify({"error": "Capture timed out"}), 408
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
