@@ -11,13 +11,15 @@ RUN apt-get update && apt-get install -y \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip install --no-cache-dir click scapy matplotlib
+
 RUN groupadd -g 1000 wireshark || true \
     && usermod -aG wireshark root || true \
     && chmod 750 /usr/bin/dumpcap \
-    && setcap 'CAP_NET_RAW+eip CAP_NET_ADMIN+eip' /usr/bin/dumpcap \
-    || chmod +s /usr/bin/dumpcap
-
-RUN pip install --no-cache-dir click scapy matplotlib
+    && setcap 'CAP_NET_RAW+eip CAP_NET_ADMIN+eip' /usr/bin/dumpcap || true \
+    && chmod +s /usr/bin/dumpcap || true \
+    && chmod 755 /usr/bin/tshark \
+    && chmod 755 /usr/bin/tcpdump
 
 RUN useradd -m -u 1000 appuser \
     && groupadd -g 1000 wireshark || true \

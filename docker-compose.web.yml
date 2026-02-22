@@ -9,12 +9,9 @@ services:
       - "5000:5000"
     volumes:
       - ./data:/tmp/netcap_uploads
-    environment:
-      - FLASK_ENV=production
     privileged: true
+    user: "root"
     entrypoint: ["python", "-m", "flask", "--app", "netcapanalysis.api", "run", "--host=0.0.0.0"]
-    networks:
-      - netcap
 
   web:
     build:
@@ -24,13 +21,7 @@ services:
     container_name: netcapanalysis-web
     ports:
       - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://api:5000
     depends_on:
       - api
-    environment:
-      - REACT_APP_API_URL=http://localhost:5000
-    networks:
-      - netcap
-
-networks:
-  netcap:
-    driver: bridge
