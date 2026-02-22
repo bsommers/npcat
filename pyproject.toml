@@ -11,6 +11,8 @@ dependencies = [
     "click>=8.0.0",
     "scapy>=2.5.0",
     "matplotlib>=3.5.0",
+    "flask>=3.0.0",
+    "flask-cors>=4.0.0",
 ]
 
 [project.scripts]
@@ -19,4 +21,4 @@ netcapanalysis = "netcapanalysis.cli:cli"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["netcapanalysis*"]
-exclude = ["reports*", ".*"]
+exclude = ["reports*", ".*", "web*"]
